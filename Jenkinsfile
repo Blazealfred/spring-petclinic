@@ -13,19 +13,26 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git url: 'https://github.com/Blazealfred/spring-petclinic.git', branch: 'main'
+                git url: 'https://github.com/Blazealfred/spring-petclinic', branch: 'main'
             }
         }
 
         stage('Build') {
+            options {
+                timeout(time: 10, unit: 'MINUTES') // Safeguard
+            }
             steps {
-                sh 'mvn clean install'
+                // Corrected CycloneDX property to skip the plugin
+                sh 'mvn clean install -B -Dcyclonedx.skip=true'
             }
         }
 
         stage('Test') {
+            options {
+                timeout(time: 5, unit: 'MINUTES') // Safeguard
+            }
             steps {
-                sh 'mvn test'
+                sh 'mvn test -B'
             }
         }
     }
